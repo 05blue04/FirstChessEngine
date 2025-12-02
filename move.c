@@ -15,6 +15,11 @@ static int is_square_valid(Square sq){
 }
 
 
+void debug_is_legal_move(Board *b, Square src, Square dst){
+    fprintf(stderr,"Checking to see if move %d to %d is valid\n",src,dst);
+    is_legal_move(b,src,dst);
+}
+
 int is_legal_move(Board *b, Square src, Square dst){
     
     if (b == NULL){
@@ -22,18 +27,25 @@ int is_legal_move(Board *b, Square src, Square dst){
         return 0;
     }
 
-    if (!is_square_valid(src))
-        return 0;
+    if (!is_square_valid(src)){
 
-    if (!is_square_valid(dst))
+        fprintf(stderr, "square %d is an invalid square\n",src);
         return 0;
+    }
+
+    if (!is_square_valid(dst)){
+        fprintf(stderr, "square %d is an invalid square\n",dst);
+        return 0;
+    }
 
     Piece p = b->board[src];
     Piece dst_p = b->board[dst];
 
     //check if a piece exists
-    if(p == EMPTY)
+    if(p == EMPTY){
+        fprintf(stderr,"piece at src:%d is empty\n",src);
         return 0;
+    }
 
     //ensure turn order 
     if(b->turn == white && p > wKing)
@@ -53,10 +65,12 @@ int is_legal_move(Board *b, Square src, Square dst){
 
 
     //case analysis
+    int check = 0;
+    printf("evaluating piece %d\n",p);
     switch (p)
     {
     case wPawn:
-        int check = src - dst;
+        check = src - dst;
         
         if(check == 10){ // move straight up
             return (dst_p == EMPTY);
@@ -70,27 +84,54 @@ int is_legal_move(Board *b, Square src, Square dst){
             return (dst_p == EMPTY && b->board[src - 10] == EMPTY);
         }
 
-        return 0;
+        break;
     
     case bPawn:
-        int check = dst - src;
+        check = dst - src;
         
-        if(check == 10){ // move straight up
+        if(check == 10){ // move straight down
             return (dst_p == EMPTY);
         }
 
-        if(check == 9 || check == 11){ // capture diagonaly to the right
+        if(check == 9 || check == 11){ // capture diagonaly
             return (dst_p != EMPTY);
         }
 
         if(check == 20 && (src >= 31 && src <= 38)){ //move up 2 ONLY on starting move
             return (dst_p == EMPTY && b->board[src + 10] == EMPTY);
         }
+        break;
 
-        return 0;
+    case wKnight:
+    case bKnight:{
+        check = dst - src;
 
+        if(check == 21 || check == 19 || check == 12 || check == 8 ||
+            check == -21 || check == -19 || check == -12 || check == 8){
+                return 1;
+        }
+
+        break;            
+    }
+
+    case wKing:
+    case bKing: {
+        int diff = dst - src;
+
+        if (diff == 1  || diff == -1  ||  // horizontal
+            diff == 10 || diff == -10 ||  // vertical
+            diff == 11 || diff == -11 ||  // diagonal
+            diff == 9  || diff == -9) {   // diag 
+            return 1;
+        }
+
+        break;
+    }
+        
     default:
         break;
     }
+
+    return 0;
 
 }

@@ -25,8 +25,9 @@ typedef struct _Board {
     int turn;
 } Board;
 
-//initialize board
-Board *create_board();
+//allocate memory for board
+Board *create_board_default();
+
 
 //print the board
 void print_board(Board *b);

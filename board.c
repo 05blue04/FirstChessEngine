@@ -1,6 +1,6 @@
 #include "board.h"
 
-Board *create_board(){
+static Board *allocate_board(){
     Board *b = malloc(sizeof(*b));
     if(b == NULL){
         return NULL;
@@ -11,6 +11,17 @@ Board *create_board(){
         free(b);
         return NULL;
     }
+
+    return b;
+}
+
+Board *create_board_default(){
+    Board *b = allocate_board();
+    if(b == NULL){
+        return NULL;
+    }
+
+    b->turn = white;
 
     //initalize pieces onto board
     for(int i = 31; i < 39; i++){
@@ -41,6 +52,7 @@ Board *create_board(){
     
     b->board[e8] = bKing;
     b->board[e1] = wKing;
+
 
     return b;
 }
