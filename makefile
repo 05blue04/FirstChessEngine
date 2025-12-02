@@ -8,7 +8,7 @@ CFLAGS = -Wall -Wextra -std=c11
 TARGET = chess
 
 # Source files
-SRCS = main.c board.c helpers.c
+SRCS = main.c board.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(TARGET)
@@ -16,7 +16,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
-%.o: %.c board.h helpers.h
+%.o: %.c board.h 
 	$(CC) $(CFLAGS) -c $<
 
 clean:

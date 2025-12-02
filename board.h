@@ -3,7 +3,6 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-#include "helpers.h"
 
 typedef enum{ EMPTY, wPawn, wKnight, wBishop, wRook, wQueen, wKing, bPawn, bKnight, bBishop, bRook, bQueen, bKing } Piece;  
 
