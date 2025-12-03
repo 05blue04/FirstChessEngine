@@ -38,6 +38,11 @@ int is_legal_move(Board *b, Square src, Square dst){
         return 0;
     }
 
+    if(src == dst){
+        fprintf(stderr, "cant move piece to same square\n");
+        return 0;
+    }
+
     Piece p = b->board[src];
     Piece dst_p = b->board[dst];
 
@@ -70,7 +75,6 @@ int is_legal_move(Board *b, Square src, Square dst){
 
     //case analysis
     int check = 0;
-    printf("evaluating piece %d\n",p);
     switch (p)
     {
     case wPawn:
@@ -191,7 +195,7 @@ int is_legal_move(Board *b, Square src, Square dst){
 
         //traverse path of rook to ensure no pieces are blocking its path
         int square = src + dir;
-        while(dir != dst){
+        while(square != (int)dst){
             if (b->board[square] != EMPTY){
                 return 0;
             }
@@ -236,9 +240,9 @@ int is_legal_move(Board *b, Square src, Square dst){
         }
 
         // traverse the path
-        int square = src;
-        while(square != dst){
-            if(b->board[square] != check){
+        int square = src + dir;
+        while(square != (int)dst){
+            if(b->board[square] != EMPTY){
                 return 0;
             }
             square += dir;

@@ -8,4 +8,6 @@ int is_legal_move(Board *b, Square src, Square dst);
 
 void make_move(Board *b, Square src, Square dst);
 
+void test_movement();
+
 #endif
