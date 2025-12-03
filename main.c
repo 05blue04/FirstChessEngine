@@ -22,8 +22,12 @@ int main(int argc, char **argv){
         if(b == NULL)
             return EXIT_FAILURE;
         print_board(b);
+        make_move(b,e2,e4);
+        make_move(b,e7,e5);
+        make_move(b,f1,a6);
+        make_move(b,c1,e3);
 
-
+        print_board(b);
         destroy_board(b);
     }
     else if(argc == 2 && strcmp(argv[1], "--help") == 0) {

@@ -48,11 +48,15 @@ int is_legal_move(Board *b, Square src, Square dst){
     }
 
     //ensure turn order 
-    if(b->turn == white && p > wKing)
+    if(b->turn == white && p > wKing){
+        fprintf(stderr,"moving out of order whites turn\n");
         return 0;
+    }
 
-    if(b->turn ==  black && p <= wKing)
+    if(b->turn ==  black && p <= wKing){
+        fprintf(stderr,"moving out of order blacks turn\n");
         return 0;
+    }
 
     //check if capturing not capturing own piece
     if (dst_p != EMPTY){
@@ -107,7 +111,7 @@ int is_legal_move(Board *b, Square src, Square dst){
         check = dst - src;
 
         if(check == 21 || check == 19 || check == 12 || check == 8 ||
-            check == -21 || check == -19 || check == -12 || check == 8){
+            check == -21 || check == -19 || check == -12 || check == -8){
                 return 1;
         }
 
@@ -116,6 +120,7 @@ int is_legal_move(Board *b, Square src, Square dst){
 
     case wKing:
     case bKing: {
+        printf("check\n");
         int diff = dst - src;
 
         if (diff == 1  || diff == -1  ||  // horizontal
@@ -127,6 +132,120 @@ int is_legal_move(Board *b, Square src, Square dst){
 
         break;
     }
+
+    case wBishop:
+    case bBishop:{
+        check = dst - src;
+        int dir = 0;
+
+        // determining diagonal direction
+        if(check % 11 == 0){
+            if(check > 0 ){
+                dir = 11;
+            }else{
+                dir = -11;
+            }
+        } else if (check % 9 == 0){
+            if( check > 0 ){
+                dir = 9;
+            }else{
+                dir = -9;
+            }
+        } else{
+            return 0;
+        }
+
+        //traverse the path of the diagonal to ensure nothing is blocking the move
+        int square = src + dir; 
+        while(square != (int)dst){
+            if(b->board[square] != EMPTY){ //check if path is occupied
+                return 0;
+            }
+            square += dir;
+        }
+
+        return 1;
+
+    }
+
+    case wRook:
+    case bRook:{
+        check = dst - src;
+        int dir = 0;
+
+        if(check % 10  == 0){
+            if(check > 0){
+                dir = 10;
+            }else{
+                dir = -10;
+            }
+        } else if(src / 10 == dst / 10){
+            if(check > 0 ){
+                dir = 1;
+            } else{
+                dir = -1;
+            }
+        } else{
+            return 0;
+        }
+
+        //traverse path of rook to ensure no pieces are blocking its path
+        int square = src + dir;
+        while(dir != dst){
+            if (b->board[square] != EMPTY){
+                return 0;
+            }
+            square += dir;
+        }
+
+        return 1;
+    }
+
+    case wQueen:
+    case bQueen:{
+        check = dst - src;
+        int dir = 0;
+
+        //lowk light just a combo of rook + bishop moves
+        if(check % 10  == 0){
+            if(check > 0){
+                dir = 10;
+            }else{
+                dir = -10;
+            }
+        } else if(src / 10 == dst / 10){
+            if(check > 0 ){
+                dir = 1;
+            } else{
+                dir = -1;
+            }
+        } else if(check % 11 == 0){
+            if(check > 0 ){
+                dir = 11;
+            }else{
+                dir = -11;
+            }
+        } else if (check % 9 == 0){
+            if( check > 0 ){
+                dir = 9;
+            }else{
+                dir = -9;
+            }
+        } else{
+            return 0;
+        }
+
+        // traverse the path
+        int square = src;
+        while(square != dst){
+            if(b->board[square] != check){
+                return 0;
+            }
+            square += dir;
+        }
+
+        return 1;
+    }
         
     default:
         break;
@@ -134,4 +253,17 @@ int is_legal_move(Board *b, Square src, Square dst){
 
     return 0;
 
+}
+
+void make_move(Board *b, Square src, Square dst){
+    if(!is_legal_move(b,src,dst)){
+        fprintf(stderr,"move is illegal \n");
+        return;
+    }
+
+   Piece p = b->board[src];
+   b->board[src] = EMPTY; 
+   b->board[dst] = p;
+
+   b->turn ^= 1;
 }
