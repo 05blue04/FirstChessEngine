@@ -432,6 +432,43 @@ int is_in_check(Board *b, int color){
     return is_square_attacked(b, king_sq, enemy);
 }
 
+int has_legal_moves(Board *b, int color) {
+    // Loop through all squares
+    for (int rank = 2; rank <= 9; rank++) {
+        for (int file = 1; file <= 8; file++) {
+            Square src = rank * 10 + file;
+            Piece p = b->board[src];
+            
+            // Skip empty squares and opponent pieces
+            if (p == EMPTY) continue;
+            if (color == white && p > wKing) continue;
+            if (color == black && p <= wKing) continue;
+            
+            // Try all possible destination squares
+            for (int dst_rank = 2; dst_rank <= 9; dst_rank++) {
+                for (int dst_file = 1; dst_file <= 8; dst_file++) {
+                    Square dst = dst_rank * 10 + dst_file;
+                    
+                    // Temporarily suppress error messages
+                    if (is_legal_move(b, src, dst)) {
+                        return 1;  // Found a legal move!
+                    }
+                }
+            }
+        }
+    }
+    
+    return 0;  // No legal moves
+}
+
+int is_checkmate(Board *b, int color) {
+    return is_in_check(b, color) && !has_legal_moves(b, color);
+}
+
+int is_stalemate(Board *b, int color) {
+    return !is_in_check(b, color) && !has_legal_moves(b, color);
+}
+
 void make_move(Board *b, Square src, Square dst){
     if(!is_legal_move(b,src,dst)){
         fprintf(stderr,"move is illegal \n");
